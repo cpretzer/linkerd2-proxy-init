@@ -42,6 +42,7 @@ jobs:
         architecture: aarch64
         distribution: ubuntu18.04
         run: |
+          apt-get install -y -qq curl
 
           # Install Docker
           curl -fsSL https://get.docker.com | sh
