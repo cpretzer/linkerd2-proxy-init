@@ -30,3 +30,24 @@ jobs:
       run: |
         cd integration_test
         ./run_tests.sh
+  arm64_integration_tests:
+    name: ARM64 integration tests
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Docker build
+      run: |
+        docker build -t gcr.io/linkerd-io/proxy-init:latest .
+        docker build -t buoyantio/iptables-tester:v1 -f integration_test/iptables/Dockerfile-tester ./integration_test
+    - name: Run integration tests with k3s cluster using QEMU
+      uses: uraimo/run-on-arch-action@v1.0.9
+      with:
+        architecture: aarch64
+        distribution: ubuntu18.04
+      run: |
+        uname -a
+        curl -sfL https://get.k3s.io | sh -
+        kubectl get nodes
+        cd integration_test
+        ./run_tests.sh
