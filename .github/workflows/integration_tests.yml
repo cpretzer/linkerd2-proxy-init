@@ -59,6 +59,7 @@ jobs:
 
           # Create a cluster
           k3d create cluster --wait 300
+          for i in `seq 50`; do docker ps -a; done
           export KUBECONFIG="$(k3d get-kubeconfig)"
           kubectl cluster-info
 
