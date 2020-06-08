@@ -60,8 +60,9 @@ jobs:
 
           # Create a cluster
           k3d create cluster --wait 300
-          for i in `seq 60`; do docker ps -a && sleep 1; done
-          export KUBECONFIG="$(k3d get-kubeconfig)"
+          for i in `seq 5`; do docker ps -a && sleep 1; done
+          docker exec k3d-k3s-default-server uname -a
+          export KUBECONFIG="$(/usr/local/bin/k3d get-kubeconfig --name='k3s-default')"
           kubectl cluster-info
 
           # Run the tests
