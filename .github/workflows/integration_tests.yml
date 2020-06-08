@@ -38,8 +38,8 @@ jobs:
       uses: actions/checkout@v2
     - run: |
         docker build -t gcr.io/linkerd-io/proxy-init:latest .
-        curl -s https://raw.githubusercontent.com/rancher/k3d/master/install.sh | bash
-        k3d create cluster k3s-proxy-init
+        curl -s https://raw.githubusercontent.com/rancher/k3d/master/install.sh | TAG=v3.0.0-rc.2 bash
+        k3d create cluster --switch
         kubectl get pods --all-namespaces
 
     # - name: Run integration tests with k3s cluster using QEMU
@@ -58,13 +58,13 @@ jobs:
     #       curl -fsSL https://get.docker.com | sh
 
     #       # Install k3d
-    #       curl -s https://raw.githubusercontent.com/rancher/k3d/master/install.sh | bash
+    #       curl -s https://raw.githubusercontent.com/rancher/k3d/master/install.sh | TAG=v3.0.0-rc.2 bash
 
     #       # Build docker images
     #       docker build -t gcr.io/linkerd-io/proxy-init:latest .
 
     #       # Create a cluster
-    #       k3d create cluster k3s-proxy-init
+    #       k3d create cluster --switch
     #       kubectl get pods --all-namespaces
 
     #       # Run the tests
