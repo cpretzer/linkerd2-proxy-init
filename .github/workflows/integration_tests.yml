@@ -45,9 +45,10 @@ jobs:
       with:
         architecture: aarch64
         distribution: ubuntu18.04
-      run: |
-        uname -a
-        curl -sfL https://get.k3s.io | sh -
-        kubectl get nodes
-        cd integration_test
-        ./run_tests.sh
+        run: |
+          uname -a
+          docker images
+          curl -sfL https://get.k3s.io | sh -
+          kubectl get nodes
+          cd integration_test
+          ./run_tests.sh
