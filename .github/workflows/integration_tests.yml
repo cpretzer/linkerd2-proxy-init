@@ -42,28 +42,19 @@ jobs:
         architecture: aarch64
         distribution: ubuntu18.04
         run: |
-          # Install kubectl
-          apt-get update -qq && apt-get install -y -qq apt-transport-https gnupg2 curl
-          curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
-          echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list
-          apt-get update -qq && apt-get install -y -qq kubectl
 
           # Install Docker
           curl -fsSL https://get.docker.com | sh
 
-          # Install k3d
-          curl -s https://raw.githubusercontent.com/rancher/k3d/master/install.sh | TAG=v1.7.0 bash
+          # Install k3s
+          curl -sfL https://get.k3s.io | sh -
+          export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+          kubectl cluster-info
+          kubectl get nodes
 
           # Build docker images
           docker build -t gcr.io/linkerd-io/proxy-init:latest .
           docker inspect gcr.io/linkerd-io/proxy-init:latest
-
-          # Create a cluster
-          k3d create cluster --wait 300
-          for i in `seq 5`; do docker ps -a && sleep 1; done
-          docker exec k3d-k3s-default-server uname -a
-          export KUBECONFIG="$(/usr/local/bin/k3d get-kubeconfig --name='k3s-default')"
-          kubectl cluster-info
 
           # Run the tests
           cd integration_test
