@@ -58,7 +58,7 @@ jobs:
           docker build -t gcr.io/linkerd-io/proxy-init:latest .
 
           # Create a cluster
-          k3d create cluster
+          k3d create cluster --wait 300
           export KUBECONFIG="$(k3d get-kubeconfig)"
           kubectl cluster-info
 
