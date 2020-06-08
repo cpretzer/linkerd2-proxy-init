@@ -49,7 +49,7 @@ jobs:
           apt-get update && apt-get install -y kubectl
 
           # Install Docker
-          # curl -fsSL https://get.docker.com | sh
+          curl -fsSL https://get.docker.com | sh
 
           # Install k3d
           curl -s https://raw.githubusercontent.com/rancher/k3d/master/install.sh | bash
