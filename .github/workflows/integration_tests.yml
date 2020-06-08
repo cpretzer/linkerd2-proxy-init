@@ -36,19 +36,18 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-    - name: Docker build
-      run: |
-        docker build -t gcr.io/linkerd-io/proxy-init:latest .
-        docker build -t buoyantio/iptables-tester:v1 -f integration_test/iptables/Dockerfile-tester ./integration_test
     - name: Run integration tests with k3s cluster using QEMU
       uses: uraimo/run-on-arch-action@v1.0.9
       with:
         architecture: aarch64
         distribution: ubuntu18.04
         run: |
-          uname -a
+          apt-get update && apt-get install -y curl
+          curl -fsSL https://get.docker.com | sh -
+          curl -s https://raw.githubusercontent.com/rancher/k3d/master/install.sh | bash
           docker images
-          curl -sfL https://get.k3s.io | sh -
+          k3d create cluster k3s-proxy-init
           kubectl get nodes
-          cd integration_test
-          ./run_tests.sh
+          kubectl get pods --all-namespaces
+          ls -al
+          pwd
