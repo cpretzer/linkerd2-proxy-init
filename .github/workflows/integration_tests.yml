@@ -42,12 +42,26 @@ jobs:
         architecture: aarch64
         distribution: ubuntu18.04
         run: |
-          apt-get update && apt-get install -y curl
-          curl -fsSL https://get.docker.com | sh -
+          # Install kubectl
+          apt-get update && apt-get install -y apt-transport-https gnupg2 curl
+          curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+          echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list
+          apt-get update && apt-get install -y kubectl
+
+          # Install Docker
+          # curl -fsSL https://get.docker.com | sh
+
+          # Install k3d
           curl -s https://raw.githubusercontent.com/rancher/k3d/master/install.sh | bash
-          docker images
+
+          # Build docker images
+          docker build -t gcr.io/linkerd-io/proxy-init:latest .
+          docker build -t buoyantio/iptables-tester:v1 -f integration_test/iptables/Dockerfile-tester ./integration_test
+
+          # Create a cluster
           k3d create cluster k3s-proxy-init
-          kubectl get nodes
           kubectl get pods --all-namespaces
-          ls -al
-          pwd
+
+          # Run the tests
+          cd integration_test
+          ./run_tests.sh
