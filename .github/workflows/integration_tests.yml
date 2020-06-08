@@ -56,7 +56,6 @@ jobs:
 
           # Build docker images
           docker build -t gcr.io/linkerd-io/proxy-init:latest .
-          docker build -t buoyantio/iptables-tester:v1 -f integration_test/iptables/Dockerfile-tester ./integration_test
 
           # Create a cluster
           k3d create cluster k3s-proxy-init
