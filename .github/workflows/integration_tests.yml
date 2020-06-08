@@ -56,6 +56,7 @@ jobs:
 
           # Build docker images
           docker build -t gcr.io/linkerd-io/proxy-init:latest .
+          docker inspect gcr.io/linkerd-io/proxy-init:latest
 
           # Create a cluster
           k3d create cluster --wait 300
