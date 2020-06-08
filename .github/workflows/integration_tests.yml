@@ -52,13 +52,15 @@ jobs:
           curl -fsSL https://get.docker.com | sh
 
           # Install k3d
-          curl -s https://raw.githubusercontent.com/rancher/k3d/master/install.sh | TAG=v3.0.0-rc.2 bash
+          curl -s https://raw.githubusercontent.com/rancher/k3d/master/install.sh | TAG=v1.7.0 bash
 
           # Build docker images
           docker build -t gcr.io/linkerd-io/proxy-init:latest .
 
           # Create a cluster
-          k3d create cluster --switch
+          k3d create cluster
+          export KUBECONFIG="$(k3d get-kubeconfig)"
+          kubectl cluster-info
 
           # Run the tests
           cd integration_test
