@@ -36,37 +36,30 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-    - run: |
-        docker build -t gcr.io/linkerd-io/proxy-init:latest .
-        curl -s https://raw.githubusercontent.com/rancher/k3d/master/install.sh | TAG=v3.0.0-rc.2 bash
-        k3d create cluster --switch
-        kubectl get pods --all-namespaces
+    - name: Run integration tests with k3s cluster using QEMU
+      uses: uraimo/run-on-arch-action@v1.0.9
+      with:
+        architecture: aarch64
+        distribution: ubuntu18.04
+        run: |
+          # Install kubectl
+          apt-get update && apt-get install -y apt-transport-https gnupg2 curl
+          curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+          echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list
+          apt-get update && apt-get install -y kubectl
 
-    # - name: Run integration tests with k3s cluster using QEMU
-    #   uses: uraimo/run-on-arch-action@v1.0.9
-    #   with:
-    #     architecture: aarch64
-    #     distribution: ubuntu18.04
-    #     run: |
-    #       # Install kubectl
-    #       apt-get update && apt-get install -y apt-transport-https gnupg2 curl
-    #       curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
-    #       echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list
-    #       apt-get update && apt-get install -y kubectl
+          # Install Docker
+          curl -fsSL https://get.docker.com | sh
 
-    #       # Install Docker
-    #       curl -fsSL https://get.docker.com | sh
+          # Install k3d
+          curl -s https://raw.githubusercontent.com/rancher/k3d/master/install.sh | TAG=v3.0.0-rc.2 bash
 
-    #       # Install k3d
-    #       curl -s https://raw.githubusercontent.com/rancher/k3d/master/install.sh | TAG=v3.0.0-rc.2 bash
+          # Build docker images
+          docker build -t gcr.io/linkerd-io/proxy-init:latest .
 
-    #       # Build docker images
-    #       docker build -t gcr.io/linkerd-io/proxy-init:latest .
+          # Create a cluster
+          k3d create cluster --switch
 
-    #       # Create a cluster
-    #       k3d create cluster --switch
-    #       kubectl get pods --all-namespaces
-
-    #       # Run the tests
-    #       cd integration_test
-    #       ./run_tests.sh
+          # Run the tests
+          cd integration_test
+          ./run_tests.sh
